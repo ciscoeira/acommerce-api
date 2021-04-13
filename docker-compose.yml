@@ -1,0 +1,35 @@
+version: '2.2'
+
+services:
+  db:
+    container_name: acommerce-db
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: acommerce
+      MYSQL_USER: acommerce
+      MYSQL_PASSWORD: acommerce
+      MYSQL_ROOT_PASSWORD: acommerce
+  app:
+    container_name: acommerce-app
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    volumes:
+    - ./:/var/www/html
+    environment:
+      DATABASE_URL: mysql://acommerce:acommerce@db:3306/acommerce?serverVersion=5.7
+      APP_ENV: dev
+    links:
+      - db
+    depends_on:
+      - db
+  web:
+    container_name: acommerce-web
+    build:
+      context: .
+      dockerfile: ./docker/web/Dockerfile
+    ports:
+      - "8015:80"
+    depends_on:
+      - app
+      - db
