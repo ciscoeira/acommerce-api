@@ -7,7 +7,7 @@
 Download project.
     
 ```
-git clone git@bitbucket.org:2mm/neure.git
+git clone https://github.com/ciscoeira/acommerce-api.git
 ```
 
 Init docker containers.
