@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CategoryRepository::class)
@@ -19,6 +20,8 @@ class Category
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      *
+     * @Assert\Positive(message="Invalid id.")
+     *
      * @OA\Property(type="integer", example=1)
      * @Groups({"category_read", "product_write"})
      */
@@ -27,6 +30,9 @@ class Category
     /**
      * @ORM\Column(type="string", length=255)
      *
+     * @Assert\NotBlank(message="Name is required.")
+     * @Assert\Length(max=255, maxMessage="Name is too long.")
+     *
      * @OA\Property(type="string", maxLength=255, example="Foo")
      * @Groups({"category_write", "category_read", "product_read"})
      */
@@ -34,6 +40,8 @@ class Category
 
     /**
      * @ORM\Column(type="text", nullable=true)
+     *
+     * @Assert\Length(max=1000, maxMessage="Description is too long.")
      *
      * @OA\Property(type="string", maxLength=1000, example="Bar")
      * @Groups({"category_write", "category_read"})

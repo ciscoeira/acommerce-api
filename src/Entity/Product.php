@@ -9,6 +9,7 @@ use Fresh\DoctrineEnumBundle\Validator\Constraints as DoctrineAssert;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ProductRepository::class)
@@ -20,6 +21,8 @@ class Product
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      *
+     * @Assert\Positive(message="Invalid id.")
+     *
      * @OA\Property(type="integer", example=1)
      * @Groups({"product_read"})
      */
@@ -27,6 +30,9 @@ class Product
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
+     * @Assert\NotBlank(message="Name is required.")
+     * @Assert\Length(max=255, maxMessage="Name is too long.")
      *
      * @OA\Property(type="string", maxLength=255, example="Foo")
      * @Groups({"product_write", "product_read"})
@@ -44,6 +50,9 @@ class Product
     /**
      * @ORM\Column(type="decimal", precision=7, scale=2)
      *
+     * @Assert\NotNull(message="Price is required.")
+     * @Assert\PositiveOrZero(message="Invalid price.")
+     *
      * @OA\Property(type="double", example="105.00")
      * @Groups({"product_write", "product_read"})
      */
@@ -51,7 +60,7 @@ class Product
 
     /**
      * @ORM\Column(name="currency", type="ProductCurrencyType", nullable=false)
-     * @DoctrineAssert\Enum(entity="App\DBAL\Types\ProductCurrencyType")
+     * @DoctrineAssert\Enum(entity="App\DBAL\Types\ProductCurrencyType", message="Invalid currency.")
      *
      * @OA\Property(type="string", enum={"USD", "EUR"}, example="USD")
      * @Groups({"product_write", "product_read"})
@@ -60,6 +69,8 @@ class Product
 
     /**
      * @ORM\Column(type="boolean")
+     *
+     * @Assert\NotNull
      *
      * @OA\Property(type="boolean")
      * @Groups({"product_write", "product_read"})

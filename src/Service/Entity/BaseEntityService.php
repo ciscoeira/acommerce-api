@@ -52,9 +52,9 @@ abstract class BaseEntityService
         return true;
     }
 
-    public function find(int $id)
+    public function find($id)
     {
-        return $this->om->getRepository($this->entityClass)->find($id);
+        return $this->om->getRepository($this->entityClass)->find((int) $id);
     }
 
     public function findAll()
