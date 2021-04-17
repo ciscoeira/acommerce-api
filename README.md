@@ -30,6 +30,12 @@ Run db migrations.
 docker-compose exec app php bin/console doctrine:migrations:migrate --no-interaction
 ```   
 
+Generate the SSL keys:
+
+```
+docker-compose exec app php bin/console lexik:jwt:generate-keypair --skip-if-exists
+```
+
 Load test data
 
 ```
