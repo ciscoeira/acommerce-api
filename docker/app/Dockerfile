@@ -9,7 +9,5 @@ RUN set -xe \
 
 RUN curl --show-error --silent https://getcomposer.org/installer | php \
     && mv composer.phar /usr/local/bin/composer
-#    \
-#    && composer install -v
 
 WORKDIR /var/www/html

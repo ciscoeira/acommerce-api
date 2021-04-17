@@ -1,4 +1,4 @@
-version: '2.2'
+version: '3'
 
 services:
   db:
@@ -9,27 +9,31 @@ services:
       MYSQL_USER: acommerce
       MYSQL_PASSWORD: acommerce
       MYSQL_ROOT_PASSWORD: acommerce
+    ports:
+      - "33061:3306"
+    networks:
+      - acommerce
+
   app:
     container_name: acommerce-app
     build:
       context: .
       dockerfile: ./docker/app/Dockerfile
     volumes:
-    - ./:/var/www/html
-    environment:
-      DATABASE_URL: mysql://acommerce:acommerce@db:3306/acommerce?serverVersion=5.7
-      APP_ENV: dev
-    links:
-      - db
-    depends_on:
-      - db
+      - ./:/var/www/html
+    networks:
+      - acommerce
   web:
     container_name: acommerce-web
     build:
       context: .
       dockerfile: ./docker/web/Dockerfile
+    volumes:
+          - ./:/var/www/html
     ports:
       - "8015:80"
-    depends_on:
-      - app
-      - db
+    networks:
+      - acommerce
+
+networks:
+    acommerce:
