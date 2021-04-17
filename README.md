@@ -2,7 +2,7 @@
 
 
 
-## Create dev/test environment:
+## Setup dev/test environment:
 
 Download project.
     
@@ -36,7 +36,7 @@ Load test data
 docker-compose exec app php bin/console doctrine:fixtures:load --no-interaction
 ```   
 
-API authentication is disabled by default but you can enable it by changing: `- { path: ^/api, roles: IS_AUTHENTICATED_ANONYMOUSLY }` to `- { path: ^/api, roles: IS_AUTHENTICATED_FULLY }`
+API authentication is enabled by default but you can disable it by changing: `- { path: ^/api, roles: IS_AUTHENTICATED_FULLY }` to `- { path: ^/api, roles: IS_AUTHENTICATED_ANONYMOUSLY }`
 
 Credentials for demo API Authentication are:
 
@@ -47,7 +47,7 @@ That's it! You are ready to go.
 
 ## Access
 
-API: Api is mounted by default in `localhost:8015/api`.
+API: Go to [localhost:8015/api/doc](http://localhost:8015/api/doc) to see the doc and test it.
 
 DB: Database is already configured but if you need local access: 
 

@@ -32,6 +32,5 @@ class ProductRepository extends ServiceEntityRepository
             /** @var Product $product */
             return $product->convertPrice($currency, $exchangeRate);
         }, $products);
-
     }
 }

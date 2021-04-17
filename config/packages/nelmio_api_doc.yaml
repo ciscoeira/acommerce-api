@@ -16,6 +16,42 @@ nelmio_api_doc:
         security:
             - Bearer: []
 
+        paths:
+            /api/login_check:
+                post:
+                    tags:
+                        - Login
+                    summary: Login into the api.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        username:
+                                            type: string
+                                            example: demo
+                                        password:
+                                            type: string
+                                            example: demo
+                                    type: object
+                    responses:
+                        '200':
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+                                            refresh_token:
+                                                type: string
+                        '401':
+                            description: Invalid credentials
+                        '400':
+                            description: Invalid JSON.
+                    security: []
+
     areas:
         path_patterns: # an array of regexps
             - ^/api(?!/doc)

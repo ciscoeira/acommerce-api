@@ -4,8 +4,6 @@ namespace App\Controller;
 
 use App\DBAL\Types\ProductCurrencyType;
 use App\Entity\Product;
-use App\Repository\CategoryRepository;
-use App\Repository\ProductRepository;
 use App\Service\Entity\ProductService;
 use App\Service\ExchangeRateService;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -38,20 +36,29 @@ class ProductController extends AbstractController
      *     description="Product created",
      *     @Model(type=Product::class, groups={"product_read"})
      * )
+     * @OA\Tag(name="Store")
      */
     public function createProduct(Request $request, ProductService $productService)
     {
-        if ($productService->create(json_decode($request->getContent(), true))->save()) {
-            return $this->json([
-                'product' => $productService->getEntity()
-            ], JsonResponse::HTTP_CREATED, [], [
-                'groups' => ['product_read']
-            ]);
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data)) {
+            return $this->json(['errors' => ['Invalid JSON provided.']], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        return $this->json([
-            'errors' => $productService->getErrors()
-        ], JsonResponse::HTTP_BAD_REQUEST);
+        if ($productService->create($data)->save()) {
+            return $this->json(
+                ['product' => $productService->getEntity()],
+                JsonResponse::HTTP_CREATED,
+                [],
+                ['groups' => ['product_read']]
+            );
+        }
+
+        return $this->json(
+            ['errors' => $productService->getErrors()],
+            JsonResponse::HTTP_BAD_REQUEST
+        );
     }
 
     /**
@@ -60,7 +67,7 @@ class ProductController extends AbstractController
      * @Route("/api/product", name="list_products", methods={"GET"})
      *
      * @param Request $request
-     * @param ProductRepository $productRepository
+     * @param ProductService $productService
      * @return JsonResponse
      *
      * @OA\Response(
@@ -68,16 +75,18 @@ class ProductController extends AbstractController
      *     description="Product created",
      *     @Model(type=Product::class, groups={"product_read"})
      * )
+     * @OA\Tag(name="Store")
      */
-    public function listProducts(Request $request, ProductRepository $productRepository)
+    public function listProducts(Request $request, ProductService $productService)
     {
-        $products = $productRepository->findAll();
+        $products = $productService->findAll();
 
-        return $this->json([
-            'products' => $products
-        ], JsonResponse::HTTP_OK, [], [
-            'groups' => ['product_read']
-        ]);
+        return $this->json(
+            ['products' => $products],
+            JsonResponse::HTTP_OK,
+            [],
+            ['groups' => ['product_read']]
+        );
     }
 
     /**
@@ -86,7 +95,7 @@ class ProductController extends AbstractController
      * @Route("/api/product/featured", name="featured_products", methods={"GET"})
      *
      * @param Request $request
-     * @param ProductRepository $productRepository
+     * @param ProductService $productService
      * @param ExchangeRateService $exchangeRateService
      * @return JsonResponse
      *
@@ -101,20 +110,32 @@ class ProductController extends AbstractController
      *     description="Product created",
      *     @Model(type=Product::class, groups={"product_read"})
      * )
+     * @OA\Tag(name="Store")
      */
-    public function listFeaturedProducts(Request $request, ProductRepository $productRepository, ExchangeRateService $exchangeRateService)
-    {
+    public function listFeaturedProducts(
+        Request $request,
+        ProductService $productService,
+        ExchangeRateService $exchangeRateService
+    ) {
         $toCurrency = $request->get('currency');
         $fromCurrency = ($toCurrency == ProductCurrencyType::EUR) ? ProductCurrencyType::USD : ProductCurrencyType::EUR;
 
-        $exchangeRate = isset($toCurrency) ? $exchangeRateService->exchangeRate($fromCurrency, $toCurrency) : 1;
+        try {
+            $exchangeRate = isset($toCurrency) ? $exchangeRateService->exchangeRate($fromCurrency, $toCurrency) : 1;
+        } catch (\Exception $e) {
+            return $this->json(
+                ['errors' => 'Error in the exchange service.'],
+                JsonResponse::HTTP_BAD_GATEWAY
+            );
+        }
 
-        $products = $productRepository->findFeatured($toCurrency, $exchangeRate);
+        $products = $productService->findFeatured($toCurrency, $exchangeRate);
 
-        return $this->json([
-            'products' => $products
-        ], JsonResponse::HTTP_OK, [], [
-            'groups' => ['product_read']
-        ]);
+        return $this->json(
+            ['products' => $products],
+            JsonResponse::HTTP_OK,
+            [],
+            ['groups' => ['product_read']]
+        );
     }
 }

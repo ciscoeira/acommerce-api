@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Category;
-use App\Repository\CategoryRepository;
 use App\Service\Entity\CategoryService;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Parameter;
@@ -36,23 +35,26 @@ class CategoryController extends AbstractController
      *     description="Category created",
      *     @Model(type=Category::class, groups={"category_read"})
      * )
-     *
+     * @OA\Tag(name="Store")
      */
     public function createCategory(Request $request, CategoryService $categoryService)
     {
-        $categoryService->create(json_decode($request->getContent(), true));
-        if ($categoryService->create(json_decode($request->getContent(), true))->save()) {
+        $data = json_decode($request->getContent(), true);
 
-            return $this->json([
-                'category' => $categoryService->getEntity()
-            ], JsonResponse::HTTP_CREATED, [], [
-                'groups' => ['category_read']
-            ]);
+        if (!isset($data)) {
+            return $this->json(['errors' => ['Invalid JSON provided.']], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        return $this->json([
-            'errors' => $categoryService->getErrors()
-        ], JsonResponse::HTTP_BAD_REQUEST);
+        if ($categoryService->create($data)->save()) {
+            return $this->json(
+                ['category' => $categoryService->getEntity()],
+                JsonResponse::HTTP_CREATED,
+                [],
+                ['groups' => ['category_read']]
+            );
+        }
+
+        return $this->json(['errors' => $categoryService->getErrors()], JsonResponse::HTTP_BAD_REQUEST);
     }
 
     /**
@@ -63,7 +65,6 @@ class CategoryController extends AbstractController
      * @param int $id
      * @param Request $request
      * @param CategoryService $categoryService
-     * @param CategoryRepository $categoryRepository
      * @return JsonResponse
      * @throws \Exception
      *
@@ -75,22 +76,29 @@ class CategoryController extends AbstractController
      *     description="Category updated",
      *     @Model(type=Category::class, groups={"category_read"})
      * )
-     *
+     * @OA\Tag(name="Store")
      */
-    public function updateCategory(int $id, Request $request, CategoryService $categoryService, CategoryRepository $categoryRepository)
+    public function updateCategory(int $id, Request $request, CategoryService $categoryService)
     {
-        $category = $categoryRepository->find($id);
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data)) {
+            return $this->json(['errors' => ['Invalid JSON provided.']], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
+        $category = $categoryService->find($id);
 
         if (!isset($category)) {
             return $this->json(['errors' => ['Category not found.']], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        if ($categoryService->update($category, json_decode($request->getContent(), true))->save()) {
-            return $this->json([
-                'category' => $categoryService->getEntity()
-            ], JsonResponse::HTTP_OK, [], [
-                'groups' => ['category_read']
-            ]);
+        if ($categoryService->update($category, $data)->save()) {
+            return $this->json(
+                ['category' => $categoryService->getEntity()],
+                JsonResponse::HTTP_OK,
+                [],
+                ['groups' => ['category_read']]
+            );
         }
 
         return $this->json(['errors' => $categoryService->getErrors()], JsonResponse::HTTP_BAD_REQUEST);
@@ -103,17 +111,17 @@ class CategoryController extends AbstractController
      *
      * @param int $id
      * @param CategoryService $categoryService
-     * @param CategoryRepository $categoryRepository
      * @return JsonResponse
      *
      * @OA\Response(
      *     response=204,
      *     description="Category removed"
      * )
+     * @OA\Tag(name="Store")
      */
-    public function deleteCategory(int $id, CategoryService $categoryService, CategoryRepository $categoryRepository)
+    public function deleteCategory(int $id, CategoryService $categoryService)
     {
-        $category = $categoryRepository->find($id);
+        $category = $categoryService->find($id);
 
         if (!isset($category)) {
             return $this->json(['errors' => ['Category not found.']], JsonResponse::HTTP_BAD_REQUEST);
@@ -123,8 +131,9 @@ class CategoryController extends AbstractController
             return $this->json(null, JsonResponse::HTTP_NO_CONTENT);
         }
 
-        return $this->json([
-            'errors' => $categoryService->getErrors()
-        ], JsonResponse::HTTP_BAD_REQUEST);
+        return $this->json(
+            ['errors' => $categoryService->getErrors()],
+            JsonResponse::HTTP_BAD_REQUEST
+        );
     }
 }

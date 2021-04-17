@@ -17,7 +17,7 @@ abstract class BaseEntityService
         $this->om = $om;
         $this->validator = $validator;
 
-        if(empty($this->entityClass)) {
+        if (empty($this->entityClass)) {
             throw new \Exception("Missing entity class.");
         }
     }
@@ -50,6 +50,16 @@ abstract class BaseEntityService
         }
 
         return true;
+    }
+
+    public function find(int $id)
+    {
+        return $this->om->getRepository($this->entityClass)->find($id);
+    }
+
+    public function findAll()
+    {
+        return $this->om->getRepository($this->entityClass)->findAll();
     }
 
     public function setProperties(array $properties = []): self
@@ -93,7 +103,6 @@ abstract class BaseEntityService
             $this->om->persist($this->entity);
             $this->om->flush();
         } catch (\Exception $ex) {
-            throw $ex;
             $this->errors[] = "Unable to save entity.";
 
             return false;
