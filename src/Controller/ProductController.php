@@ -124,7 +124,7 @@ class ProductController extends AbstractController
             $exchangeRate = isset($toCurrency) ? $exchangeRateService->exchangeRate($fromCurrency, $toCurrency) : 1;
         } catch (\Exception $e) {
             return $this->json(
-                ['errors' => 'Error in the exchange service.'],
+                ['errors' => $e->getMessage()],
                 JsonResponse::HTTP_BAD_GATEWAY
             );
         }

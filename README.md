@@ -21,7 +21,7 @@ docker-compose up --build -d
 Install dependencies
 
 ```
-docker-compose exec composer install --no-interaction
+docker-compose exec app composer install --no-interaction
 ``` 
    
 Run db migrations.

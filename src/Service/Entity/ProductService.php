@@ -20,6 +20,6 @@ class ProductService extends BaseEntityService
 
     public function findFeatured(?string $currency, float $exchangeRate)
     {
-        $this->om->getRepository($this->entityClass)->findFeatured($currency, $exchangeRate);
+        return $this->om->getRepository($this->entityClass)->findFeatured($currency, $exchangeRate);
     }
 }

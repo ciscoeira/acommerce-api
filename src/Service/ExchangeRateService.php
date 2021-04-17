@@ -23,8 +23,14 @@ class ExchangeRateService
             'to' => $to
         ];
 
-        $response = $this->exchangerate->request('GET', 'latest', ['query' => $params])->toArray();
+        $response = $this->exchangerate->request('GET', 'latest', ['query' => $params]);
 
-        return $response['rates'][$to];
+        $content = json_decode($response->getContent(false));
+
+        if (isset($content->error)) {
+            throw new \Exception('Error in the exchange service. Code: '  . $content->error->code);
+        }
+
+        return $content->rates->{$to};
     }
 }
