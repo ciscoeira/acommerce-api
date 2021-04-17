@@ -36,8 +36,6 @@ Load test data
 docker-compose exec app php bin/console doctrine:fixtures:load --no-interaction
 ```   
 
-API authentication is enabled by default but you can disable it by changing: `- { path: ^/api, roles: IS_AUTHENTICATED_FULLY }` to `- { path: ^/api, roles: IS_AUTHENTICATED_ANONYMOUSLY }`
-
 Credentials for demo API Authentication are:
 
     - user: demo
