@@ -36,16 +36,16 @@ Load test data
 docker-compose exec app php bin/console doctrine:fixtures:load --no-interaction
 ```   
 
-Credentials for demo API Authentication are:
-
-    - user: demo
-    - pass: demo
-
 That's it! You are ready to go.
 
 ## Access
 
 API: Go to [localhost:8015/api/doc](http://localhost:8015/api/doc) to see the doc and test it.
+
+Credentials for demo API Authentication are:
+
+    - user: demo
+    - pass: demo
 
 DB: Database is already configured but if you need local access: 
 
